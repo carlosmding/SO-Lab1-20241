@@ -1,0 +1,6 @@
+Ejemplo
+para lectura
+de un archivo
+desde programa
+C
+Gracias
