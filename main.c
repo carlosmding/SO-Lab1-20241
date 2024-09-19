@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void leerArchivo(char *nombreArchivo);
+
 int main(int argc, char *argv[])
 {
  //Creación de main inicial
@@ -17,21 +19,7 @@ int main(int argc, char *argv[])
  else if (argc == 2) { 
     printf("Segundo escenario (Sólo archivo de entrada)\n");
     //Función para leer el archivo de entrada
-    FILE *archivo = fopen(argv[1], "r");
-      if (archivo == NULL) {
-         fprintf(stderr, "error: cannot open file %s \n", argv[1]); 
-         exit(1);
-      }
-      char *linea = NULL;   // Puntero para la línea
-      size_t tamano = 0;    // Tamaño del buffer para `getline`
-      ssize_t leidos;       // Tamaño de la línea leída, o -1 en caso de error o EOF
-
-      // Leer cada línea del archivo e imprimirla
-      while ((leidos = getline(&linea, &tamano, archivo)) != -1) {
-         printf("%s", linea); 
-      }
-      free(linea);
-      fclose(archivo);
+    leerArchivo(argv[1]);
 
     //Funcion para invertir el texto
     //Imprimir el resultado final en pantalla 
@@ -39,7 +27,7 @@ int main(int argc, char *argv[])
 
  else if (argc == 3) { 
     printf("Tercer escenario (Archivo de entrada y salida)\n");
-    //Función para leer el archivo de entrada
+    leerArchivo(argv[1]);
     //Funcion para invertir el texto
     //Función para escribir el texo invertido en archivo de salida
     exit(0); }
@@ -48,5 +36,25 @@ int main(int argc, char *argv[])
     fprintf(stderr, "usage: reverse <input> <output>\n"); 
     exit(1); }
 
+}
+
+void leerArchivo(char *nombreArchivo) {
+    FILE *archivo = fopen(nombreArchivo, "r");
+    if (archivo == NULL) {
+        fprintf(stderr, "error: cannot open file %s\n", nombreArchivo);
+        exit(1);
+    }
+    
+    char *linea = NULL;   // Puntero para la línea
+    size_t tamano = 0;    // Tamaño del buffer para `getline`
+    ssize_t leidos;       // Tamaño de la línea leída, o -1 en caso de error o EOF
+
+    // Leer cada línea del archivo e imprimirla
+    while ((leidos = getline(&linea, &tamano, archivo)) != -1) {
+        printf("%s", linea);
+    }
+
+    free(linea);
+    fclose(archivo);
 }
 
