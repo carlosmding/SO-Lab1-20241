@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 void leerArchivo(char *nombreArchivo);
+void ingresarTexto();
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +13,7 @@ int main(int argc, char *argv[])
  if (argc == 1) { 
     printf("Primer escenario (Sin archivo de entrada ni salida)\n");
     //Función para leer desde pantalla Stdin
+    ingresarTexto();
     //Funcion para invertir el texto
     //Imprimir el resultado final en pantalla
     exit(0); }
@@ -38,6 +40,20 @@ int main(int argc, char *argv[])
 
 }
 
+void ingresarTexto() {
+    char *linea = NULL;  // Puntero para almacenar la línea leída
+    size_t tamano = 0;   // Tamaño del buffer que usará getline
+    ssize_t leidos;      // Resultado de getline (número de caracteres leídos)
+
+    printf("Escriba a continuación el texto que desea ingresar (Ctrl+D para finalizar):\n");
+
+    // Leer líneas desde stdin hasta que se detecte EOF
+    while ((leidos = getline(&linea, &tamano, stdin)) != -1) {
+        printf("Línea ingresada: %s", linea);  // Imprimir la línea leída
+    }
+    free(linea); 
+}
+
 void leerArchivo(char *nombreArchivo) {
     FILE *archivo = fopen(nombreArchivo, "r");
     if (archivo == NULL) {
@@ -57,4 +73,6 @@ void leerArchivo(char *nombreArchivo) {
     free(linea);
     fclose(archivo);
 }
+
+
 
