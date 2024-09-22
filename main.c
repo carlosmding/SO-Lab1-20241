@@ -16,23 +16,27 @@ void ingresarTexto();
 void inicializarPila(Stack *pila);              // Función para inicializar la pila
 void push(Stack *pila, char *linea);            // Función para empujar una línea a la pila
 char *pop(Stack *pila);                         // Función para sacar una línea de la pila
+void imprimirInverso(Stack *pila);              // Función para imprimir texto orden inverso
 
 int main(int argc, char *argv[])
 {
  //Creación de main inicial
  //printf("Práctica #1 - Sistemas Operativos\n");
+ Stack pila;       // Definición de la pila
+ inicializarPila(&pila);  // Inicializamos la pila
 
  //Validación de los diferentes escenarios
  if (argc == 1) { 
-    printf("Primer escenario (Sin archivo de entrada ni salida)\n");
+    //printf("Primer escenario (Sin archivo de entrada ni salida)\n");
     //Función para leer desde pantalla Stdin
-    ingresarTexto();
-    //Funcion para invertir el texto
-    //Imprimir el resultado final en pantalla
+    ingresarTexto(&pila);
+    //Funcion para imprimir en orden inverso en pantalla
+    imprimirInverso(&pila);
+
     exit(0); }
 
  else if (argc == 2) { 
-    printf("Segundo escenario (Sólo archivo de entrada)\n");
+    //printf("Segundo escenario (Sólo archivo de entrada)\n");
     //Función para leer el archivo de entrada
     leerArchivo(argv[1]);
 
@@ -41,7 +45,7 @@ int main(int argc, char *argv[])
     exit(0); }
 
  else if (argc == 3) { 
-    printf("Tercer escenario (Archivo de entrada y salida)\n");
+    //printf("Tercer escenario (Archivo de entrada y salida)\n");
     leerArchivo(argv[1]);
     //Funcion para invertir el texto
     //Función para escribir el texo invertido en archivo de salida
@@ -53,7 +57,7 @@ int main(int argc, char *argv[])
 
 }
 
-void ingresarTexto() {
+void ingresarTexto(Stack *pila) {
     char *linea = NULL;  // Puntero para almacenar la línea leída
     size_t tamano = 0;   // Tamaño del buffer que usará getline
     ssize_t leidos;      // Resultado de getline (número de caracteres leídos)
@@ -62,8 +66,7 @@ void ingresarTexto() {
 
     // Leer líneas desde stdin hasta que se detecte EOF
     while ((leidos = getline(&linea, &tamano, stdin)) != -1) {
-        printf("Línea ingresada: %s", linea);  // Imprimir la línea leída
-
+        push(pila, linea);  // Empuja la línea a la pila
     }
     free(linea); 
 }
@@ -71,7 +74,7 @@ void ingresarTexto() {
 void leerArchivo(char *nombreArchivo) {
     FILE *archivo = fopen(nombreArchivo, "r");
     if (archivo == NULL) {
-        fprintf(stderr, "error: cannot open file %s\n", nombreArchivo);
+        fprintf(stderr, "reverse: cannot open file '%s'\n", nombreArchivo);
         exit(1);
     }
     
@@ -123,6 +126,16 @@ char *pop(Stack *pila) {
     char *linea = pila->lineas[pila->cima];  // Guarda la línea en la cima
     pila->cima--;  // Reduce la cima de la pila
     return linea;  // Retorna la línea
+}
+
+// Función para imprimir las líneas en orden inverso (sacándolas de la pila)
+void imprimirInverso(Stack *pila) {
+    char *linea;
+    // Imprimir líneas mientras haya elementos en la pila
+    while ((linea = pop(pila)) != NULL) {
+        printf("%s", linea);  // Imprime la línea (las líneas ya incluyen el salto de línea)
+        free(linea);  // Libera la memoria de la línea
+    }
 }
 
 
