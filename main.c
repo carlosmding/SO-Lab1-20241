@@ -1,13 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define INITIAL_CAPACITY 10  // Capacidad inicial de la pila
+
+// Definición de la estructura de la pila
+typedef struct {
+    char **lineas;    // Arreglo de punteros a las líneas
+    int cima;         // Índice del elemento superior (cima) en la pila
+    int capacidad;    // Capacidad actual de la pila
+} Stack;
 
 void leerArchivo(char *nombreArchivo);
 void ingresarTexto();
+void inicializarPila(Stack *pila);              // Función para inicializar la pila
+void push(Stack *pila, char *linea);            // Función para empujar una línea a la pila
+char *pop(Stack *pila);                         // Función para sacar una línea de la pila
 
 int main(int argc, char *argv[])
 {
  //Creación de main inicial
- printf("Práctica #1 - Sistemas Operativos\n");
+ //printf("Práctica #1 - Sistemas Operativos\n");
 
  //Validación de los diferentes escenarios
  if (argc == 1) { 
@@ -50,6 +63,7 @@ void ingresarTexto() {
     // Leer líneas desde stdin hasta que se detecte EOF
     while ((leidos = getline(&linea, &tamano, stdin)) != -1) {
         printf("Línea ingresada: %s", linea);  // Imprimir la línea leída
+
     }
     free(linea); 
 }
@@ -72,6 +86,43 @@ void leerArchivo(char *nombreArchivo) {
 
     free(linea);
     fclose(archivo);
+}
+
+// Función para inicializar la pila
+void inicializarPila(Stack *pila) {
+    pila->capacidad = INITIAL_CAPACITY; // Establece la capacidad inicial de la pila
+    pila->cima = -1;                    // La pila está vacía, así que la cima es -1
+    pila->lineas = (char **)malloc(pila->capacidad * sizeof(char *)); // Asigna memoria para el arreglo de punteros
+    if (pila->lineas == NULL) { // Verifica si la asignación de memoria fue exitosa
+        fprintf(stderr, "Error: No se pudo asignar memoria para la pila\n");
+        exit(1);
+    }
+}
+
+// Función para empujar una línea a la pila
+void push(Stack *pila, char *linea) {
+    // Si la pila está llena, duplicamos su capacidad
+    if (pila->cima == pila->capacidad - 1) {
+        pila->capacidad *= 2;  // Duplica la capacidad de la pila
+        pila->lineas = (char **)realloc(pila->lineas, pila->capacidad * sizeof(char *)); // Redimensiona el arreglo
+        if (pila->lineas == NULL) { // Verifica si la redimensión de la memoria fue exitosa
+            fprintf(stderr, "Error: No se pudo redimensionar la pila\n");
+            exit(1);
+        }
+    }
+
+    pila->lineas[++(pila->cima)] = strdup(linea);  // Copia la línea a la pila y actualiza la cima
+}
+
+// Función para sacar una línea de la pila
+char *pop(Stack *pila) {
+    if (pila->cima == -1) {
+        return NULL;  // La pila está vacía
+    }
+    
+    char *linea = pila->lineas[pila->cima];  // Guarda la línea en la cima
+    pila->cima--;  // Reduce la cima de la pila
+    return linea;  // Retorna la línea
 }
 
 
