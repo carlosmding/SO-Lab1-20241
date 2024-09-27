@@ -1,6 +1,3 @@
-Ejemplo
-para lectura
-de un archivo
-desde programa
-C
-Gracias
+Archivo para prueba de entrada
+Texto 1
+Otra linea

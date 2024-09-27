@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define INITIAL_CAPACITY 10  // Capacidad inicial de la pila
 
@@ -11,13 +12,14 @@ typedef struct {
     int capacidad;    // Capacidad actual de la pila
 } Stack;
 
-void leerArchivo(char *nombreArchivo, Stack *pila);          //Función para leer un texto y guardarlo en la pila
-void ingresarTexto();
-void inicializarPila(Stack *pila);                           // Función para inicializar la pila
-void push(Stack *pila, char *linea);                         // Función para empujar una línea a la pila
-char *pop(Stack *pila);                                      // Función para sacar una línea de la pila
-void imprimirInverso(Stack *pila);                           // Función para imprimir texto orden inverso
-void liberarPila(Stack *pila);                               // Función para liberar la memoria de la pila
+void leerArchivo(char *nombreArchivo, Stack *pila);           // Función para leer un texto y guardarlo en la pila
+void ingresarTexto(Stack *pila);                              // Función para ingresar texto entrada estandar
+void inicializarPila(Stack *pila);                            // Función para inicializar la pila
+void push(Stack *pila, char *linea);                          // Función para empujar una línea a la pila
+char *pop(Stack *pila);                                       // Función para sacar una línea de la pila
+void imprimirInverso(Stack *pila);                            // Función para imprimir texto orden inverso
+void liberarPila(Stack *pila);                                // Función para liberar la memoria de la pila
+void escribirArchivo(Stack *pila, char *nombreArchivoSalida); // Función para escribir en archivo de salida
 
 
 int main(int argc, char *argv[])
@@ -51,10 +53,32 @@ int main(int argc, char *argv[])
 
  else if (argc == 3) { 
     //printf("Tercer escenario (Archivo de entrada y salida)\n");
+    // Verifica si el archivo de entrada y salida son el mismo, incluido harlink y si existen
+
+    struct stat stat1;
+    if (stat(argv[1], &stat1) == -1) {
+        fprintf(stderr, "reverse: cannot open file '%s'\n", argv[1]);
+        exit(1);
+    }
+
+    // Verifica si el archivo de salida existe
+    struct stat stat2;
+    if (stat(argv[2], &stat2) == -1) {
+        fprintf(stderr, "reverse: cannot open file '%s'\n", argv[2]);
+        exit(1);
+    }
+
+    // Verifica si el archivo de entrada y salida son el mismo
+    if (stat1.st_ino == stat2.st_ino) {
+        fprintf(stderr, "reverse: input and output file must differ\n");
+        exit(1);
+    }
+
     //Función para leer el archivo de entrada y guardar en pila
     leerArchivo(argv[1], &pila);
-    //Funcion para invertir el texto
+
     //Función para escribir el texo invertido en archivo de salida
+    escribirArchivo(&pila, argv[2]);
 
     liberarPila(&pila);      // Liberar la memoria de la pila
     exit(0); }
@@ -70,7 +94,7 @@ void ingresarTexto(Stack *pila) {
     size_t tamano = 0;   // Tamaño del buffer que usará getline
     ssize_t leidos;      // Resultado de getline (número de caracteres leídos)
 
-    printf("Escriba a continuación el texto que desea ingresar (Ctrl+D para finalizar):\n");
+    //printf("Escriba a continuación el texto que desea ingresar (Ctrl+D para finalizar):\n");
 
     // Leer líneas desde stdin hasta que se detecte EOF
     while ((leidos = getline(&linea, &tamano, stdin)) != -1) {
@@ -152,6 +176,23 @@ void liberarPila(Stack *pila) {
         free(pila->lineas[pila->cima--]);  // Libera las líneas restantes en la pila
     }
     free(pila->lineas);  // Libera el arreglo de punteros
+}
+
+void escribirArchivo(Stack *pila, char *nombreArchivoSalida) {
+
+    FILE *archivoSalida = fopen(nombreArchivoSalida, "w");
+    if (archivoSalida == NULL) {
+        fprintf(stderr, "reverse: cannot open file '%s'\n", nombreArchivoSalida);
+        exit(1);
+    }
+
+    char *linea;
+    while ((linea = pop(pila)) != NULL) {
+        fprintf(archivoSalida, "%s", linea);  // Escribe la línea en el archivo de salida
+        free(linea);  // Libera la memoria de la línea
+    }
+
+    fclose(archivoSalida);  // Cierra el archivo de salida
 }
 
 
