@@ -11,12 +11,14 @@ typedef struct {
     int capacidad;    // Capacidad actual de la pila
 } Stack;
 
-void leerArchivo(char *nombreArchivo);
+void leerArchivo(char *nombreArchivo, Stack *pila);          //Función para leer un texto y guardarlo en la pila
 void ingresarTexto();
-void inicializarPila(Stack *pila);              // Función para inicializar la pila
-void push(Stack *pila, char *linea);            // Función para empujar una línea a la pila
-char *pop(Stack *pila);                         // Función para sacar una línea de la pila
-void imprimirInverso(Stack *pila);              // Función para imprimir texto orden inverso
+void inicializarPila(Stack *pila);                           // Función para inicializar la pila
+void push(Stack *pila, char *linea);                         // Función para empujar una línea a la pila
+char *pop(Stack *pila);                                      // Función para sacar una línea de la pila
+void imprimirInverso(Stack *pila);                           // Función para imprimir texto orden inverso
+void liberarPila(Stack *pila);                               // Función para liberar la memoria de la pila
+
 
 int main(int argc, char *argv[])
 {
@@ -32,23 +34,29 @@ int main(int argc, char *argv[])
     ingresarTexto(&pila);
     //Funcion para imprimir en orden inverso en pantalla
     imprimirInverso(&pila);
+    
+    liberarPila(&pila);      // Liberar la memoria de la pila
 
     exit(0); }
 
  else if (argc == 2) { 
     //printf("Segundo escenario (Sólo archivo de entrada)\n");
-    //Función para leer el archivo de entrada
-    leerArchivo(argv[1]);
+    //Función para leer el archivo de entrada y guardar en pila
+    leerArchivo(argv[1], &pila);
+    //Funcion para imprimir en orden inverso en pantalla
+    imprimirInverso(&pila);
 
-    //Funcion para invertir el texto
-    //Imprimir el resultado final en pantalla 
+    liberarPila(&pila);      // Liberar la memoria de la pila
     exit(0); }
 
  else if (argc == 3) { 
     //printf("Tercer escenario (Archivo de entrada y salida)\n");
-    leerArchivo(argv[1]);
+    //Función para leer el archivo de entrada y guardar en pila
+    leerArchivo(argv[1], &pila);
     //Funcion para invertir el texto
     //Función para escribir el texo invertido en archivo de salida
+
+    liberarPila(&pila);      // Liberar la memoria de la pila
     exit(0); }
 
  else if (argc > 3) { 
@@ -71,7 +79,7 @@ void ingresarTexto(Stack *pila) {
     free(linea); 
 }
 
-void leerArchivo(char *nombreArchivo) {
+void leerArchivo(char *nombreArchivo, Stack *pila) {
     FILE *archivo = fopen(nombreArchivo, "r");
     if (archivo == NULL) {
         fprintf(stderr, "reverse: cannot open file '%s'\n", nombreArchivo);
@@ -82,12 +90,12 @@ void leerArchivo(char *nombreArchivo) {
     size_t tamano = 0;    // Tamaño del buffer para `getline`
     ssize_t leidos;       // Tamaño de la línea leída, o -1 en caso de error o EOF
 
-    // Leer cada línea del archivo e imprimirla
+    // Leer cada línea del archivo y guardarlo en la pila
     while ((leidos = getline(&linea, &tamano, archivo)) != -1) {
-        printf("%s", linea);
+        push(pila, linea);  // Empuja la línea a la pila
     }
-
     free(linea);
+
     fclose(archivo);
 }
 
@@ -136,6 +144,14 @@ void imprimirInverso(Stack *pila) {
         printf("%s", linea);  // Imprime la línea (las líneas ya incluyen el salto de línea)
         free(linea);  // Libera la memoria de la línea
     }
+}
+
+// Función para liberar la memoria de la pila
+void liberarPila(Stack *pila) {
+    while (pila->cima != -1) {
+        free(pila->lineas[pila->cima--]);  // Libera las líneas restantes en la pila
+    }
+    free(pila->lineas);  // Libera el arreglo de punteros
 }
 
 
